@@ -26,7 +26,7 @@ const encodeJS = (bin) => {
   const nlen = len * 8 / 7 + (len % 7 == 0 ? 0 : 1);
   const res = new Uint8Array(nlen * 2 + 2); // for worst-case
   let idx = 0;
-  res[idx++] = 96;
+  res[idx++] = 34;
   let bits = 0;
   let nbits = 6;
   for (let i = 0; i < len; i++) {
@@ -37,7 +37,10 @@ const encodeJS = (bin) => {
         if (bits == 13) { // \r
           res[idx++] = 92;
           res[idx++] = 114;
-        } else if (bits == 36 || bits == 92 || bits == 96) { // $\'
+        } else if (bits == 10) { // \n
+          res[idx++] = 92;
+          res[idx++] = 110;
+        } else if (bits == 92 || bits == 34) { // \"
           res[idx++] = 92;
           res[idx++] = bits;
         } else {
@@ -51,7 +54,7 @@ const encodeJS = (bin) => {
     }
   }
   res[idx++] = bits;
-  res[idx++] = 96;
+  res[idx++] = 34;
   return new TextDecoder().decode(new Uint8Array(res.buffer, 0, idx));
   //return String.fromCharCode(...new Uint8Array(res.buffer, 0, idx));
 };
