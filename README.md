@@ -21,3 +21,10 @@ console.log("Base122 size = " + base122Encoded.length); // Base122 size = 1634
 console.log("Base128 size = " + base128Encoded.length); // Base128 size = 1634
 console.log("Saved " + (base64Encoded.length - base128Encoded.length) + " bytes") // Saved 274 bytes
 ```
+
+## Build
+
+```
+npm i -g uglify-js-harmony
+uglifyjs decode.js -c -m --screw-ie8 --lint -o decode.min.js
+```
