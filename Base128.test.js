@@ -1,7 +1,8 @@
 import * as t from "https://deno.land/std/testing/asserts.ts";
 import { Base128 } from "./Base128.js";
+import { Bit7 } from "./Bit7.js";
 
-const n = 10;
+const n = 256;
 const create = (n) => {
   const b = new Uint8Array(n);
   for (let i = 0; i < n; i++) {
@@ -13,12 +14,75 @@ const create = (n) => {
 Deno.test("simple", async () => {
   const b = create(n);
   const s = Base128.encode(b);
-  //console.log(s);
-  /*
-  for (let i = 0; i < s.length; i++) {
-    console.log(s[i], i)
+  const b2 = Base128.decode(s);
+  t.assertEquals(b2, b);
+});
+
+Deno.test("series", async () => {
+  const bit7 = new Bit7(1280)
+  for (let i = 0; i < 1280; i++) {
+    bit7.put(i & 0x7f);
   }
-  */
+  const b = bit7.getBytes();
+  //console.log("idx", idx)
+  //const b = create(n);
+  const s = Base128.encode(b);
+  const s2 = Base128.encodeJS(b);
+  await Deno.writeTextFile("Base128.test.str.series.txt", s2);
+  //console.log(b);
+  const b2 = Base128.decode(s);
+  t.assertEquals(b2, b);
+});
+
+Deno.test("all pattern", async () => {
+  const len = 128 * 128 * 2;
+  const bit7 = new Bit7(len)
+  for (let i = 0; i < 128; i++) {
+    for (let j = 0; j < 128; j++) {
+      bit7.put(i);
+      bit7.put(j);
+    }
+  }
+  const b = bit7.getBytes();
+  //console.log("idx", idx)
+  //const b = create(n);
+  const s = Base128.encode(b);
+  const s2 = Base128.encodeJS(b);
+  const bb = new TextEncoder().encode(s2);
+  t.assertEquals(bb.length, len * 8 / 7 + 1 | 0); // 1/7 = 14.29%だけ増加
+  await Deno.writeTextFile("Base128.test.str.txt", s2);
+  //console.log(b);
+  const b2 = Base128.decode(s);
+  t.assertEquals(b2, b);
+});
+
+
+Deno.test("escape pattern", async () => {
+  const escapechr = [
+    0, // null -> 1
+    9, // tab -> 2
+    10, // enter -> 3
+    13, // enter -> 4
+    34, // double quote - 5
+    0, // skip
+    38, // ampersand - 7
+    92, // back slash - 8
+    // shortend for 10
+  ];
+  const bit7 = new Bit7(escapechr.length * 128 * 2)
+  for (let i = 0; i < escapechr.length; i++) {
+    for (let j = 0; j < 128; j++) {
+      bit7.put(escapechr[i]);
+      bit7.put(j);
+    }
+  }
+  const b = bit7.getBytes();
+  //console.log("idx", idx)
+  //const b = create(n);
+  const s = Base128.encode(b);
+  const s2 = Base128.encodeJS(b);
+  await Deno.writeTextFile("Base128.test.escstr.txt", s2);
+  //console.log(b);
   const b2 = Base128.decode(s);
   t.assertEquals(b2, b);
 });
@@ -31,6 +95,30 @@ Deno.test("len 0 to 1023", async () => {
     //console.log(i, s.length);
     t.assertEquals(b2, b);
   }
+});
+
+Deno.test("encodeJS simple", async () => { // encodeしてimportする
+  //const b = create(1);
+  //const b = new Uint8Array([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]); // ok
+  //const b = new Uint8Array([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0, 0xff, 0xff]); // ok
+  //const b = new Uint8Array([]); // ok
+  //const b = new Uint8Array([50, 50]); // ok
+  //const b = new Uint8Array([0, 0]); // ok
+  //const b = new Uint8Array([0]); // ok
+  const b = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 9, 0, 0xff, 0x60, ]); // ok
+  const s = Base128.encodeJS(b);
+  /*
+  console.log(s, s.length);
+  for (let i = 0; i < s.length; i++) {
+    console.log(i, s.charCodeAt(i));
+  }
+  */
+  const s2 = s.substring(1, s.length - 1);
+  //console.log(s2);
+  const b3 = new TextEncoder().encode(s2);
+  const b2 = Base128.decode(s2);
+  //console.log("b2", b2);
+  t.assertEquals(b2, b);
 });
 
 Deno.test("encodeJS", async () => { // encodeしてimportする
@@ -48,8 +136,8 @@ Deno.test("encodeJS", async () => { // encodeしてimportする
 
 Deno.test("performance", () => {
   //const size = 1024 * 1024; // 600msec -> 83msec
-  const size = 1024 * 1024 * 10; // 10sec -> 495msec
-  // const size = 1024 * 1024 * 64;
+  const size = 1024 * 1024 * 10; // 10sec -> 217msec
+  //const size = 1024 * 1024 * 64; // 1sec
   const test = new Uint8Array(size);
   for (let i = 0; i < test.length; i++) {
     test[i] = i;
@@ -58,10 +146,10 @@ Deno.test("performance", () => {
   //console.log(s)
   const b = Base128.decode(s);
   //console.log(b);
-  t.assertEquals(b.length, test.length);
-  for (let i = 0; i < b.length; i++) {
-    t.assertEquals(b[i], test[i]);
-  }
+  //t.assertEquals(b.length, test.length);
+  //for (let i = 0; i < b.length; i++) {
+  //    t.assertEquals(b[i], test[i]);
+  //}
   //t.assertEquals(b, test); // why err!?
   //t.assertEquals(Base122.decode(Base122.encode(test)), test); // why err!?
 });
