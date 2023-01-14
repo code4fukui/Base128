@@ -35,8 +35,7 @@ const escapechr = [
 
 const encodeJS = (bin) => {
   const len = bin.length;
-  //const res = new Uint16Array(((len / 7 * 8) >> 0) + (len % 7 == 0 ? 0 : 1) + 2);
-  const res = new Uint16Array(((len / 7 * 8) >> 0) + 3);
+  const res = new Uint8Array(((len / 7 * 8) >> 0) * 2 + 3);
   let idx = 0;
   res[idx++] = 34;
   let bits = 0;
@@ -50,13 +49,14 @@ const encodeJS = (bin) => {
         if (state == 0) {
           const n = escapechr.indexOf(bits);
           if (n >= 0) {
-            res[idx] = (n + 1) << 7;
+            res[idx++] = 0xc0 | ((n + 1) << 1);
             state = 1;
           } else {
             res[idx++] = bits;
           }
         } else {
-          res[idx++] |= bits;
+          res[idx - 1] |= bits >> 6;
+          res[idx++] = 0x80 | (bits & 0x3f);
           state = 0;
         }
         bits = 0;
@@ -70,16 +70,18 @@ const encodeJS = (bin) => {
     if (state == 0) {
       const n = escapechr.indexOf(bits);
       if (n >= 0) {
-        res[idx++] = (10 << 7) | bits;
+        res[idx++] = 0xc0 | (10 << 1) | (bits >> 6);
+        res[idx++] = 0x80 | (bits & 0x3f);
       } else {
         res[idx++] = bits;
       }
     } else {
-      res[idx - 1] |= bits;
+      res[idx - 1] |= bits >> 6;
+      res[idx++] |= 0x80 | (bits & 0x3f);
     }
   }
   res[idx++] = 34;
-  return String.fromCharCode.apply(null, new Uint16Array(res.buffer, 0, idx));
+  return new TextDecoder().decode(new Uint8Array(res.buffer, 0, idx));
 };
 
 const decode = (s) => {

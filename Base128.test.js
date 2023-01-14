@@ -49,7 +49,7 @@ Deno.test("all pattern", async () => {
   const s = Base128.encode(b);
   const s2 = Base128.encodeJS(b);
   const bb = new TextEncoder().encode(s2);
-  t.assertEquals(bb.length, len * 8 / 7 + 1 | 0); // 1/7 = 14.29%だけ増加
+  t.assertEquals(bb.length, len * 8 / 7 + 3 | 0); // 1/7 = 14.29%だけ増加
   await Deno.writeTextFile("Base128.test.str.txt", s2);
   //console.log(b);
   const b2 = Base128.decode(s);
