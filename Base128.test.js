@@ -1,6 +1,19 @@
-import * as t from "https://deno.land/std/testing/asserts.ts";
+import * as _t from "https://deno.land/std/testing/asserts.ts";
 import { Base128 } from "./Base128.js";
 import { Bit7 } from "./Bit7.js";
+
+const t = {
+  assertEquals: (a, b) => {
+    if (a instanceof Uint8Array && b instanceof Uint8Array) {
+      _t.assertEquals(a.length, b.length);
+      for (let i = 0; i < a.length; i++) {
+        _t.assertEquals(a[i], b[i]);
+      }
+      return;
+    }
+    return _t.assertEquals(a, b);
+  }
+};
 
 const n = 256;
 const create = (n) => {
@@ -94,8 +107,8 @@ Deno.test("escape pattern", async () => {
   t.assertEquals(b2, b);
 });
 
-Deno.test("len 0 to 1023", async () => {
-  for (let i = 0; i < 1024; i++) {
+Deno.test("len 0 to 10000", async () => {
+  for (let i = 0; i <= 10000; i++) {
     const b = create(i);
     const s = Base128.encode(b);
     const b2 = Base128.decode(s);
