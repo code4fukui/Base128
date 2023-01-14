@@ -32,6 +32,7 @@ const escapechr = [
   92, // back slash - 8
   // shortend for 10
 ];
+
 const encodeJS = (bin) => {
   const len = bin.length;
   //const res = new Uint16Array(((len / 7 * 8) >> 0) + (len % 7 == 0 ? 0 : 1) + 2);
@@ -82,8 +83,6 @@ const encodeJS = (bin) => {
 };
 
 const decode = (s) => {
-  //const bin = new TextEncoder().encode(s);
-  //const len = bin.length;
   const len = s.length;
   let elen = len;
   for (let i = 0; i < len - 1; i++) {
@@ -91,17 +90,8 @@ const decode = (s) => {
       elen++;
     }
   }
-  const shortend = s.charCodeAt(len - 1) >= 0x80;
-  if (shortend) {
-    //elen--;
-  }
-  //const res = new Uint8Array(((elen * 7 / 8) >> 0) + (elen % 8 == 0 ? 0 : shortend ? 0 : 1));
-  //const res = new Uint8Array(((elen * 7 / 8) >> 0) - (elen % 8 == 0 ? 1 : 0) - (shortend ? 1 : 0));
   const len2 = ((elen * 7 / 8) >> 0) + (elen % 8 == 0 ? 0 : 1);
   const res = new Uint8Array(len2);
-  //const res = new Uint8Array(((elen * 7 / 8) >> 0) - (shortend ? 1 : 0));
-  //const res = new Uint8Array(((elen * 7 / 8) >> 0) - (shortend ? 1 : 0));
-  //const res = new Uint8Array((len * 7 / 8) >> 0);
   let idx = 0;
   let bits = 0;
   let nbits = 7;
