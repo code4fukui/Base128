@@ -121,6 +121,11 @@ Deno.test("encodeJS simple", async () => { // encodeしてimportする
   t.assertEquals(b2, b);
 });
 
+Deno.test("write in JS", async () => {
+  const n = new Uint8Array([0, 1, 2, 3]);
+  const s = "export default " + Base128.encodeJS(n);
+  await Deno.writeTextFile("test_str.js", s);  
+});
 Deno.test("encodeJS", async () => { // encodeしてimportする
   const b = create(256);
   //console.log(b.length);
