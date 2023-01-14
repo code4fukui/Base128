@@ -11,6 +11,16 @@ const create = (n) => {
   return b;
 };
 
+Deno.test("len14", async () => {
+  const b = create(14);
+  const s = Base128.encode(b);
+  //console.log(new TextEncoder().encode(s))
+  const b2 = Base128.decode(s);
+  //console.log(s.length);
+  //console.log(b, b2)
+  t.assertEquals(b2, b);
+});
+
 Deno.test("simple", async () => {
   const b = create(n);
   const s = Base128.encode(b);
@@ -27,8 +37,7 @@ Deno.test("series", async () => {
   //console.log("idx", idx)
   //const b = create(n);
   const s = Base128.encode(b);
-  const s2 = Base128.encodeJS(b);
-  await Deno.writeTextFile("Base128.test.str.series.txt", s2);
+  await Deno.writeTextFile("Base128.test.str.series.txt", s);
   //console.log(b);
   const b2 = Base128.decode(s);
   t.assertEquals(b2, b);
@@ -47,10 +56,9 @@ Deno.test("all pattern", async () => {
   //console.log("idx", idx)
   //const b = create(n);
   const s = Base128.encode(b);
-  const s2 = Base128.encodeJS(b);
-  const bb = new TextEncoder().encode(s2);
-  t.assertEquals(bb.length, len * 8 / 7 + 3 | 0); // 1/7 = 14.29%だけ増加
-  await Deno.writeTextFile("Base128.test.str.txt", s2);
+  const bb = new TextEncoder().encode(s);
+  t.assertEquals(bb.length, len * 8 / 7 + 1 | 0); // 1/7 = 14.29%だけ増加
+  await Deno.writeTextFile("Base128.test.str.txt", s);
   //console.log(b);
   const b2 = Base128.decode(s);
   t.assertEquals(b2, b);
@@ -80,8 +88,7 @@ Deno.test("escape pattern", async () => {
   //console.log("idx", idx)
   //const b = create(n);
   const s = Base128.encode(b);
-  const s2 = Base128.encodeJS(b);
-  await Deno.writeTextFile("Base128.test.escstr.txt", s2);
+  await Deno.writeTextFile("Base128.test.escstr.txt", s);
   //console.log(b);
   const b2 = Base128.decode(s);
   t.assertEquals(b2, b);
@@ -93,11 +100,12 @@ Deno.test("len 0 to 1023", async () => {
     const s = Base128.encode(b);
     const b2 = Base128.decode(s);
     //console.log(i, s.length);
+    //console.log(b, b2)
     t.assertEquals(b2, b);
   }
 });
 
-Deno.test("encodeJS simple", async () => { // encodeしてimportする
+Deno.test("encode simple", async () => { // encodeしてimportする
   //const b = create(1);
   //const b = new Uint8Array([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]); // ok
   //const b = new Uint8Array([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0, 0xff, 0xff]); // ok
@@ -106,31 +114,27 @@ Deno.test("encodeJS simple", async () => { // encodeしてimportする
   //const b = new Uint8Array([0, 0]); // ok
   //const b = new Uint8Array([0]); // ok
   const b = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 9, 0, 0xff, 0x60, ]); // ok
-  const s = Base128.encodeJS(b);
-  /*
-  console.log(s, s.length);
-  for (let i = 0; i < s.length; i++) {
-    console.log(i, s.charCodeAt(i));
-  }
-  */
-  const s2 = s.substring(1, s.length - 1);
-  //console.log(s2);
-  const b3 = new TextEncoder().encode(s2);
-  const b2 = Base128.decode(s2);
+  const s = Base128.encode(b);
+  //console.log(s, s.length);
+  //for (let i = 0; i < s.length; i++) {
+  //  console.log(i, s.charCodeAt(i));
+  //}
+  //const b3 = new TextEncoder().encode(s);
+  const b2 = Base128.decode(s);
   //console.log("b2", b2);
   t.assertEquals(b2, b);
 });
 
 Deno.test("write in JS", async () => {
   const n = new Uint8Array([0, 1, 2, 3]);
-  const s = "export default " + Base128.encodeJS(n);
+  const s = `export default "${Base128.encode(n)}"`;
   await Deno.writeTextFile("test_str.js", s);  
 });
 Deno.test("encodeJS", async () => { // encodeしてimportする
   const b = create(256);
   //console.log(b.length);
-  const s = Base128.encodeJS(b);
-  const src = "export default " + s;
+  const s = Base128.encode(b);
+  const src = `export default "${s}"`;
   await Deno.writeTextFile("./Base128.test.str.js", src);
   //await sleep(100);
   const s2 = (await import("./Base128.test.str.js?" + Math.random())).default;

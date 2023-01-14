@@ -1,26 +1,3 @@
-const encode = (bin) => {
-  const len = bin.length;
-  const res = new Uint8Array(len * 8 / 7 + (len % 7 == 0 ? 0 : 1));
-  let idx = 0;
-  let bits = 0;
-  let nbits = 6;
-  for (let i = 0; i < len; i++) {
-    const b = bin[i];
-    for (let j = 7; j >= 0; j--) {
-      bits |= ((b >> j) & 1) << nbits;
-      if (nbits == 0) {
-        res[idx++] = bits;
-        bits = 0;
-        nbits = 6;
-      } else {
-        nbits--;
-      }
-    }
-  }
-  res[idx++] = bits;
-  return new TextDecoder().decode(res);
-};
-
 const escapechr = [
   0, // null -> 1
   9, // tab -> 2
@@ -33,11 +10,10 @@ const escapechr = [
   // shortend for 10
 ];
 
-const encodeJS = (bin) => {
+const encode = (bin) => {
   const len = bin.length;
-  const res = new Uint8Array(((len / 7 * 8) >> 0) * 2 + 3);
+  const res = new Uint8Array(((len / 7 * 8) >> 0) * 2 + 1);
   let idx = 0;
-  res[idx++] = 34;
   let bits = 0;
   let nbits = 6;
   let state = 0;
@@ -79,8 +55,12 @@ const encodeJS = (bin) => {
       res[idx - 1] |= bits >> 6;
       res[idx++] |= 0x80 | (bits & 0x3f);
     }
+  } else {
+    if (state == 1) {
+      res[idx - 1] |= bits >> 6;
+      res[idx++] |= 0x80 | (bits & 0x3f);
+    }
   }
-  res[idx++] = 34;
   return new TextDecoder().decode(new Uint8Array(res.buffer, 0, idx));
 };
 
@@ -135,4 +115,4 @@ const decode = (s) => {
   return res;
 };
 
-export const Base128 = { encode, decode, encodeJS };
+export const Base128 = { encode, decode };
