@@ -7,6 +7,17 @@ A space efficient UTF-8 binary-to-text encoding created as an alternative to Bas
 Base128 encoding produces UTF-8 characters, but encodes more bits per byte than Base64.
 ```javascript
 import { Base128 } from "https://code4fukui.github.io/Base128/Base128.js";
+const n = new Uint8Array([0, 1, 2, 3]);
+const s = Base128.encode(n);
+console.log(s);
+const m = Base128.decode(s);
+console.log(m);
+```
+
+## Test
+
+```javascript
+import { Base128 } from "https://code4fukui.github.io/Base128/Base128.js";
 import { Base122 } from "https://code4fukui.github.io/Base122/Base122.js";
 import { Base64 } from "https://code4fukui.github.io/Base64/Base64.js";
 const inputData = await Deno.readFile("test/example.jpg");
