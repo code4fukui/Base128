@@ -50,3 +50,8 @@ console.log("Saved " + (base64Encoded.length - base128Encoded.length) + " bytes"
 npm i -g uglify-js-harmony
 uglifyjs decode.js -c -m --screw-ie8 --lint -o decode.min.js
 ```
+
+## reference
+
+- [Base-122 Encoding](https://github.com/kevinAlbs/Base122)
+- [環境にやさしい開発をしよう！Base128によるJavaScriptでインポート可能な圧縮WASMの作り方](https://fukuno.jig.jp/3824)
