@@ -79,7 +79,7 @@ const encodeJS = (bin) => {
     }
   }
   res[idx++] = 34;
-  return String.fromCharCode(...new Uint16Array(res.buffer, 0, idx));
+  return String.fromCharCode.apply(null, new Uint16Array(res.buffer, 0, idx));
 };
 
 const decode = (s) => {
