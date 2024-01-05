@@ -61,7 +61,7 @@ const encode = (bin) => {
       res[idx++] |= 0x80 | (bits & 0x3f);
     }
   }
-  return new TextDecoder().decode(new Uint8Array(res.buffer, 0, idx));
+  return new TextDecoder().decode(res.subarray(0, idx));
 };
 
 const decode = (s) => {
