@@ -1,6 +1,6 @@
 # Base128 encoding (UTF-8 space efficiency 8/7)
 
-A space efficient UTF-8 binary-to-text encoding for HTML/XML/JavaScript created as an alternative to Base64. Base128 is ~14% smaller than equivalent Base64 encoded data. Details of motivation and implementation can be found on [this article](https://fukuno.jig.jp/3824).
+A space efficient UTF-8 binary-to-text encoding for HTML/XML/JavaScript created as an alternative to Base64. Base128 is ~14% smaller than equivalent Base64 encoded data.
 
 ## Usage
 
@@ -37,21 +37,13 @@ const base64Encoded = e(Base64.encode(inputData));
 const base122Encoded = e(Base122.encode(inputData));
 const base128Encoded = e(Base128.encode(inputData));
 console.log(base122Encoded.length, inputData.length)
-console.log("Original size = " + inputData.length); // Original size = 1429
-console.log("Base64 size = " + base64Encoded.length); // Base64 size = 1908
-console.log("Base122 size = " + base122Encoded.length); // Base122 size = 1634
-console.log("Base128 size = " + base128Encoded.length); // Base128 size = 1634
-console.log("Saved " + (base64Encoded.length - base128Encoded.length) + " bytes") // Saved 274 bytes
+console.log("Original size = " + inputData.length); 
+console.log("Base64 size = " + base64Encoded.length);
+console.log("Base122 size = " + base122Encoded.length);
+console.log("Base128 size = " + base128Encoded.length);
+console.log("Saved " + (base64Encoded.length - base128Encoded.length) + " bytes")
 ```
 
-## Build
+## License
 
-```
-npm i -g uglify-js-harmony
-uglifyjs decode.js -c -m --screw-ie8 --lint -o decode.min.js
-```
-
-## reference
-
-- [Base-122 Encoding](https://github.com/kevinAlbs/Base122)
-- [環境にやさしい開発をしよう！Base128によるJavaScriptでインポート可能な圧縮WASMの作り方](https://fukuno.jig.jp/3824)
+MIT License
