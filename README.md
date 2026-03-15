@@ -1,5 +1,7 @@
 # Base128 encoding (UTF-8 space efficiency 8/7)
 
+> 日本語のREADMEはこちらです: [README.ja.md](README.ja.md)
+
 A space efficient UTF-8 binary-to-text encoding for HTML/XML/JavaScript created as an alternative to Base64. Base128 is ~14% smaller than equivalent Base64 encoded data.
 
 ## Usage
