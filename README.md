@@ -48,4 +48,4 @@ console.log("Saved " + (base64Encoded.length - base128Encoded.length) + " bytes"
 
 ## License
 
-MIT License
+MIT License — see [LICENSE](LICENSE).
